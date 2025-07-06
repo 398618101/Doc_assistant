@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端API测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>前端API连接测试</h1>
+    
+    <button onclick="testCategoryStats()">测试分类统计API</button>
+    <button onclick="testCategoryDocuments()">测试分类文档API</button>
+    <button onclick="testHealthCheck()">测试健康检查</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        function addResult(title, content, isSuccess = true) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${isSuccess ? 'success' : 'error'}`;
+            resultDiv.innerHTML = `<h3>${title}</h3><pre>${content}</pre>`;
+            resultsDiv.appendChild(resultDiv);
+        }
+        
+        async function testHealthCheck() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                addResult('健康检查', JSON.stringify(data, null, 2), response.ok);
+            } catch (error) {
+                addResult('健康检查', `错误: ${error.message}`, false);
+            }
+        }
+        
+        async function testCategoryStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/documents/categories/stats`);
+                const data = await response.json();
+                addResult('分类统计API', JSON.stringify(data, null, 2), response.ok);
+            } catch (error) {
+                addResult('分类统计API', `错误: ${error.message}`, false);
+            }
+        }
+        
+        async function testCategoryDocuments() {
+            try {
+                const response = await fetch(`${API_BASE}/api/documents/categories/tech-docs`);
+                const data = await response.json();
+                addResult('分类文档API', JSON.stringify(data, null, 2), response.ok);
+            } catch (error) {
+                addResult('分类文档API', `错误: ${error.message}`, false);
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.onload = function() {
+            console.log('测试页面已加载');
+            addResult('页面状态', '测试页面已成功加载，JavaScript正常工作');
+        };
+    </script>
+</body>
+</html>
